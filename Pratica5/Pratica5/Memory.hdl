@@ -1,0 +1,33 @@
+ /**
+   * O espaço de endereço completo da memória do computador Hack,
+   * incluindo RAM e E/S mapeadas em memória.
+   * O chip facilita as operações de leitura e escrita, conforme abaixo:
+   * Ler: out(t) = Memória[endereço(t)](t)
+   * Escrever: if load(t-1) then Memory[address(t-1)](t) = in(t-1)
+   * Em palavras: o chip sempre emite o valor armazenado na memória
+   * especificada pelo endereço. Se load==1, o valor in é carregado
+   * no local de memória especificado por endereço. Este valor torna-se
+   * disponível através da saída de saída a partir do próximo intervalo de tempo.
+   * Regras de espaço de endereço:
+   * Somente as palavras superiores de 16K+8K+1 do chip de memória são usadas.
+   * O acesso ao endereço>0x6000 é inválido. Acesso a qualquer endereço em
+   * o intervalo 0x4000-0x5FFF resulta no acesso à memória da tela
+   * mapa. O acesso ao endereço 0x6000 resulta no acesso ao teclado
+   * mapa de memória. O comportamento nesses endereços é descrito nas
+   * especificações do chip de tela e teclado.
+   */
+
+
+CHIP Memory {
+    IN in[16], load, address[15];
+    OUT out[16];
+
+    PARTS:
+    // Coloque ser codigo aqui:
+	  DMux4Way(in=load, sel=address[13..14], a=loadram1, b=loadram2, c=loadscreen, d=loadkbd);
+	  Or(a=loadram1, b=loadram2, out=loadram);
+    RAM16K(in=in, load=loadram, address=address[0..13], out=ramout);
+    Screen(in=in, load=loadscreen, address=address[0..12], out=scrout);
+    Keyboard(out=kbout);
+    Mux4Way16(a=ramout, b=ramout, c=scrout, d=kbout, sel=address[13..14], out=out);
+}

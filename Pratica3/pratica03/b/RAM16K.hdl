@@ -1,0 +1,23 @@
+// Coloque o seu nome aqui: Lucas Augusto
+
+/**
+ * Memória de 16k registradores, cada um com 16 bits de largura.
+ * A saída out reflete o valor armazenado no endereço de memória
+ * especificado em adress. If load ==1, then o valor in é armazenado (loaded)
+ * no endereço de memória especificado em adress (o valor carregado será
+ * refletido na saída out a partir do próximo passo de tempo em diante).
+ */
+
+CHIP RAM16K {
+    IN in[16], load, address[14];
+    OUT out[16];
+
+    PARTS:
+    // Coloque o seu código aqui:
+    DMux4Way(in=load, sel=address[12..13], a=r1, b=r2, c=r3, d=r4);
+    RAM4K(in=in, load=r1, address=address[0..11], out=rr1);
+    RAM4K(in=in, load=r2, address=address[0..11], out=rr2);
+    RAM4K(in=in, load=r3, address=address[0..11], out=rr3);
+    RAM4K(in=in, load=r4, address=address[0..11], out=rr4);
+    Mux4Way16(a=rr1, b=rr2, c=rr3, d=rr4, sel=address[12..13], out=out);
+}

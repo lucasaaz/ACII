@@ -1,0 +1,55 @@
+ /**
+  * A CPU Hack (Unidade Central de Processamento), composta por uma ALU, dois
+  * registradores denominados A e D, e um contador de programa denominado PC.
+  *
+  * A CPU é projetada para buscar e executar instruções escritas em linguagem
+  * de máquina Hack. Em particular, funciona da seguinte forma: Executa a
+  * instrução inserida de acordo com a especificação da linguagem da máquina
+  * Hack. O D e A na especificação da linguagem referem-se aos registradores
+  * residentes na CPU, enquanto M refere-se aos registradores externos de
+  * memória endereçado por A, ou seja, para Memoria[A]. A entrada inM contém o
+  * valor deste local. Se a instrução atual precisar escrever um valor em M,
+  * o valor é colocado em outM, o endereço do local de destino é colocado na
+  * saída addressM e o o bit de controle writeM é ativado.
+  * (Quando writeM==0, qualquer valor pode aparece em outM).
+  * As saídas outM e writeM são combinacionais: eles são afetados
+  * instantaneamente pela execução do atual instrução. As saídas addressM e pc
+  * são sincronizadas pelo clock: embora sejam afetados pela execução da
+  * instrução atual, eles alteram para seus novos valores somente na próxima
+  * etapa de tempo.
+  * Se reset==1 então o A CPU pula para o endereço 0 (ou seja, pc é definido
+  * como 0 no próximo passo de tempo) em vez do que para o endereço resultante
+  * da execução da instrução atual.
+  */
+
+CHIP CPU {
+
+    IN  inM[16],         // M valor de entrada  (M = conteudo da RAM[A])
+        instruction[16], // Instrucao para execucao
+        reset;           // Sinal para reiniciar o programa atual (reset==1)
+                         // ou continuar executando o programa atual (reset==0).
+
+    OUT outM[16],        // M valor da saida
+        writeM,          // Escrever em M?
+        addressM[15],    // Endereco da memoria de dado (of M)
+        pc[15];          // Endereco da proxima instrucao
+
+    PARTS:
+    // Coloque ser código aqui:
+    Mux(a=instruction, b=ALUoutput, sel=instruction[15], out=InAR);
+
+    Not(in=instruction[15], out=a);
+    Or(a=a, b=instruction[5], out=loadAR)
+    Resgister(in=InAR, load=loadAR, out=outAR, out[0..14]=addressM)
+
+    Mux(a=outAR, b=inM, sel=instruction[12], out=outARMux);
+
+    And(a=instruction[15], b=instruction[4], out=loadDR)
+    Resgister(in=ALUoutput, load=loadDR, out=outDR)
+
+    ALU(x=outDR, y=outARMux, zx=instruction[11], nx=instruction[10], zy=instruction[9], ny=instruction[8], f=instruction[7], no=instruction[6], zr=zr, ng=ng, out=ALUoutput)
+
+    And(a=instruction[15], b=instruction[3], out=writeM)
+
+    PC(in=outAR, load=load, inc=true, reset=reset, out=outPC)
+}

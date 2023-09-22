@@ -1,0 +1,28 @@
+ /**
+   * O computador HACK, incluindo CPU, ROM e RAM.
+   * Quando reset é 0, o programa armazenado na ROM do computador é executado.
+   * Quando reset é 1, a execução do programa é reiniciada.
+   * Assim, para iniciar a execução de um programa, reset deve ser
+   * pressionado "para cima" (1) e "para baixo" (0).
+   * Deste ponto em diante, o usuário fica à mercê de
+   * o software. Em particular, dependendo do código do programa, o
+   * a tela pode mostrar alguma saída e o usuário pode interagir
+   * com o computador através do teclado.
+   */
+
+CHIP Computer {
+
+    IN reset;
+
+    PARTS:
+    // Coloque seu código aqui:
+	
+    ROM32K(address=pc,out=instruction);
+
+    CPU(inM=inM,instruction=instruction,reset=reset,outM=outM,writeM=writeM,addressM=addressM,pc=pc);
+
+    Memory(in=outM,load=writeM,address=addressM,out=inM);
+
+
+}
+

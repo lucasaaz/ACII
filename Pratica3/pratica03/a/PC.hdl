@@ -1,0 +1,25 @@
+// Coloque o seu nome aqui: Lucas Augusto
+
+/**
+ * Um contador de 16 bits com bits de controle load e reset.
+ * if      (reset[t] == 1) out[t+1] = 0
+ * else if (load[t] == 1)  out[t+1] = in[t]
+ * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (adição inteira)
+ * else                    out[t+1] = out[t]
+ */
+
+CHIP PC {
+    IN in[16],load,inc,reset;
+    OUT out[16];
+
+    PARTS:
+    // Coloque o seu código aqui:
+    Inc16(in=t0, out=t1);
+    
+    Mux16(a=t0, b=t1, sel=inc, out=Rinc);
+    Mux16(a=Rinc, b=in, sel=load, out=Rload);
+    Mux16(a=Rload, b=false, sel=reset, out=Rreset);
+
+    Register(in=Rreset, load=true, out=t0, out=out);
+
+}

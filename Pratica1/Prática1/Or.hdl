@@ -1,0 +1,37 @@
+/**
+ * Or gate:
+ * out = 1 if (a == 1 or b == 1)
+ *       0 otherwise
+ */
+
+/**         nand
+ *    0 | 0  1
+ *    0 | 1  1
+ *    1 | 0  1
+ *    1 | 1  0
+*/
+
+ /**        and
+ *    0 | 0  0
+ *    0 | 1  0
+ *    1 | 0  0
+ *    1 | 1  1
+*/
+
+/**         or
+ *    0 | 0  0
+ *    0 | 1  1
+ *    1 | 0  1
+ *    1 | 1  1
+*/
+
+CHIP Or {
+    IN a, b;
+    OUT out;
+
+    PARTS:
+    // Put your code here:
+    Nand(a=a, b=a, out=n1);
+    Nand(a=b, b=b, out=n2);
+    Nand(a=n1, b=n2, out=out);
+}
